@@ -8,5 +8,5 @@ Este pacote _Python_ permite controlar os dispositivos para experimentos com áu
 
 para instalar, faça
 ```
-pip install git+https://github.com/NeuroUFABC/Lab007/audio007@master
+pip install git+https://github.com/Neuro-UFABC/audio007
 ```
