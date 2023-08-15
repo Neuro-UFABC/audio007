@@ -17,9 +17,10 @@ def toca_audio(arquivo_wav, lado='ambos', taxa=None):
     # TODO: melhor fazer isso só uma vez, arquivos podem ser longos
     taxa_wav, dados = read(arquivo_wav)
 
-    if len(dados.shape) > 1:
-        dados = dados.mean(axis=1).astype(dados.dtype)  # se for estéreo, mixa
-        print('Áudio estéreo! Tomando média dos canais.')
+    # TODO: isso fazia sentido para grilos, mas destrói a psicofísica!
+    #if len(dados.shape) > 1:
+    #    dados = dados.mean(axis=1).astype(dados.dtype)  # se for estéreo, mixa
+    #    print('Áudio estéreo! Tomando média dos canais.')
 
     if taxa is None:
         taxa = taxa_wav
