@@ -17,6 +17,12 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+"serial",
+"scipy",
+"numpy",
+"sounddevice",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/NeuroUFABC/Lab007/ferramentas_python/audio007"
