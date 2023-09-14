@@ -1,10 +1,12 @@
 import time
 import sounddevice as sd
 from scipy.io.wavfile import write, read
+from scipy.signal import convolve
+import numpy as np
 
 
 
-def toca_audio(arquivo_wav, lado='ambos', taxa=None):
+def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None):
     if lado == 'ambos':
         lmap = [1,2]
     elif lado == 'esq':
@@ -26,8 +28,21 @@ def toca_audio(arquivo_wav, lado='ambos', taxa=None):
         taxa = taxa_wav
     else:
         taxa = 44100
+   
+    if filtro is not None:
+        #filtro_e, filtro_d = filtro.T/32768
+        #dados_e, dados_d = dados.T/32768
+
+        #dados_e = convolve(dados_e, filtro_e, mode='full', method='auto')  
+        #dados_d = convolve(dados_d, filtro_d, mode='full', method='auto')  
+        #dados = np.c_[dados_e, dados_d]
+        dados = dados / 32768  # TODO: conversão de int16 pra float hardcoded!
+        filtro = filtro / 32768  # TODO: conversão de int16 pra float hardcoded!
+        dados = np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
+                      convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
 
     sd.play(dados, mapping = lmap, blocking=True, samplerate=taxa)
+
 
 def toca_grava(estimulo, saida):
     taxa_wav, est_array = read(estimulo)
