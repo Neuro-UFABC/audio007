@@ -25,9 +25,11 @@ class Carrinho:
         self._ser.close()
 
     def habilita_motores(self):
+        print("Habilitando motores")
         self._cmd('h')
         
     def desabilita_motores(self):
+        print("Desabilitanto motores")
         self._cmd('d')
 
     def anda_xy_mm(self, mm_x, mm_y):
@@ -79,6 +81,9 @@ class Carrinho:
     def anda_eleva(self, eleva):
         self.anda_azim(eleva) 
 
+    def anda_eleva_mirado(self, azim):
+        self.anda_azim_mirado(azim) 
+
     def anda_azim(self, azim):
 
         def r(azim):
@@ -97,6 +102,14 @@ class Carrinho:
 
         return dpeq*self.passos_mm, dgrande*self.passos_mm
 
+    def anda_azim_mirado(self, azim):
+        passos = int(800 * (azim - self.azim) / 180)
+        dir = '+' if passos > 0 else '-'
+        print(f'vou andar {passos} para mirar a caixa')
+        self._cmd(f'pz{dir}{abs(passos)}')
+        time.sleep(0.5) 
+        self.anda_azim(azim) 
+        
 
     def sobe_mm(self, mm):
         passos = int(self.passos_mm * mm)
