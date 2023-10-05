@@ -82,7 +82,7 @@ class Carrinho:
         self.anda_azim(eleva) 
 
     def anda_eleva_mirado(self, azim):
-        self.anda_azim_mirado(azim) 
+        return self.anda_azim_mirado(azim) 
 
     def anda_azim(self, azim):
 
@@ -103,12 +103,12 @@ class Carrinho:
         return dpeq*self.passos_mm, dgrande*self.passos_mm
 
     def anda_azim_mirado(self, azim):
-        passos = int(800 * (azim - self.azim) / 180)
+        passos = int(1600 * (azim - self.azim) / 180)
         dir = '+' if passos > 0 else '-'
         print(f'vou andar {passos} para mirar a caixa')
         self._cmd(f'pz{dir}{abs(passos)}')
         time.sleep(0.5) 
-        self.anda_azim(azim) 
+        return self.anda_azim(azim) 
         
 
     def sobe_mm(self, mm):
