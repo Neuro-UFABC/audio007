@@ -37,10 +37,10 @@ class Carrinho:
         if self.modo == 'azimute':
             self.habilita_motores()
 
-        dirx = '+' if mm_x > 0 else '-'
+        dirx = self.direcao('x', mm_x)
         passosx = int(abs(mm_x) * self.passos_mm)
 
-        diry = '+' if mm_y > 0 else '-'
+        diry = self.direcao('y', mm_y) 
         passosy = int(abs(mm_y) * self.passos_mm)
 
         print(f'Vou dar {diry}{passosy} passos no eixo '
@@ -59,11 +59,12 @@ class Carrinho:
         if self.modo == 'azimute':
             self.habilita_motores()
 
-        dir = '+' if mm > 0 else '-'
+        xy = 'x' if eixo == 'pequeno' else 'y'
+
+        dir = self.direcao(xy, mm)
         passos = int(abs(mm) * self.passos_mm)
         print(f'Vou dar {dir}{passos} passos no eixo {eixo}')
 
-        xy = 'x' if eixo == 'pequeno' else 'y'
         self._cmd(f'p{xy}{dir}{passos}')
 
         if self.modo == 'azimute':
@@ -102,9 +103,25 @@ class Carrinho:
 
         return dpeq*self.passos_mm, dgrande*self.passos_mm
 
+    def direcao(self, eixo, passos):
+        '''
+        - Essa lógica depende de como estão conectados os motores de passo
+        (direção em que foram espetados os conectores nos soquetes)
+        - Depende também de como está montada a gaiola (se zero do azimute
+        bate com zero da elevação)
+        '''
+        if  eixo in ('y','z') and self.modo == 'azim':
+            dir ='-' if passos > 0 else '+'
+        else: 
+            dir = '+' if passos > 0 else '-'
+
+        return dir
+
     def anda_azim_mirado(self, azim):
         passos = int(1600 * (azim - self.azim) / 180)
-        dir = '+' if passos > 0 else '-'
+
+        dir = self.direcao('z', passos)
+
         print(f'vou andar {passos} para mirar a caixa')
         self._cmd(f'pz{dir}{abs(passos)}')
         time.sleep(0.5) 
