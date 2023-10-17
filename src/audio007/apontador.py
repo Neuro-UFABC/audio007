@@ -26,8 +26,13 @@ class Apontador:
     def __exit__(self, exc_type, exc_value, traceback):
         self._ser.close()
 
-    def le_pot(self, ):
-        ret = self._cmd('a')
+    def le_pot_motor(self):
+        ret = self._cmd('m')
+        val = int(ret)
+        return val
+    
+    def le_pot_linear(self):
+        ret = self._cmd('l')
         val = int(ret)
         return val
     
@@ -55,20 +60,20 @@ class Apontador:
         interp = interp1d([self.pot_min, self.pot_max],
                 [self.angulo_min, self.angulo_max],
                 fill_value='extrapolate')
-        ang = interp(self.le_pot()).tolist() 
+        ang = interp(self.le_pot_motor()).tolist() 
         return ang
 
     def calibra(self):
         print('Aponte para o máximo do alto.')
         print('Depois, aperte o botão')
         self.espera_botao()
-        self.pot_max = self.le_pot()
+        self.pot_max = self.le_pot_motor()
 
         self.espera_botao()
         print('Aponte para o máximo do baixo.')
         print('Depois, aperte o botão')
         self.espera_botao()
-        self.pot_min = self.le_pot()
+        self.pot_min = self.le_pot_motor()
 
         return self.pot_min, self.pot_max
 
