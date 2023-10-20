@@ -110,7 +110,7 @@ class Carrinho:
         - Depende também de como está montada a gaiola (se zero do azimute
         bate com zero da elevação)
         '''
-        if  eixo in ('y','z') and self.modo == 'azim':
+        if  eixo in ('y','z') and self.modo == 'azimute':
             dir ='-' if passos > 0 else '+'
         else: 
             dir = '+' if passos > 0 else '-'
@@ -123,8 +123,10 @@ class Carrinho:
         dir = self.direcao('z', passos)
 
         print(f'vou andar {passos} para mirar a caixa')
+        self.habilita_motores()
         self._cmd(f'pz{dir}{abs(passos)}')
         time.sleep(0.5) 
+        self.desabilita_motores()
         return self.anda_azim(azim) 
         
 
