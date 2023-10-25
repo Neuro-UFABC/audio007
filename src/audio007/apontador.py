@@ -4,7 +4,7 @@ import serial
 from scipy.interpolate import interp1d
 
 class Apontador:
-    def __init__(self):
+    def __init__(self, modo='eleva'):
         self._ser = serial.Serial('/dev/ttyACM0') 
         #self._ser = serial.Serial('/dev/ttyUSB0') # TODO: pode ser outra
         print('Aberta serial', self._ser.name)
@@ -18,7 +18,8 @@ class Apontador:
         # TODO: isso precisa ser medido!
         self.angulo_max = 90
         self.angulo_min = -90
-
+    
+        self.modo = modo
 
     def __enter__(self):
         return self
@@ -63,14 +64,41 @@ class Apontador:
         ang = interp(self.le_pot_motor()).tolist() 
         return ang
 
+    def distancia(self):
+        interp = interp1d([self.pot_linear_min, self.pot_linear_max],
+                [0, 1],
+                fill_value='extrapolate')
+        dist = interp(self.le_pot_linear()).tolist() 
+        return dist
+
+    def calibra_linear(self):
+        print('Aponte para longe.')
+        print('Depois, aperte o botão')
+        self.espera_botao()
+        self.pot_linear_max = self.le_pot_linear()
+
+        self.espera_botao()
+        print('Aponte para perto.')
+        print('Depois, aperte o botão')
+        self.espera_botao()
+        self.pot_linear_min = self.le_pot_linear()
+
+        return self.pot_linear_min, self.pot_linear_max
+
     def calibra(self):
-        print('Aponte para o máximo do alto.')
+        if self.modo == 'azimute':
+            print('Aponte para o máximo da direita.')
+        else:
+            print('Aponte para o máximo do alto.')
         print('Depois, aperte o botão')
         self.espera_botao()
         self.pot_max = self.le_pot_motor()
 
         self.espera_botao()
-        print('Aponte para o máximo do baixo.')
+        if self.modo == 'azimute':
+            print('Aponte para o máximo da esquerda.')
+        else:
+            print('Aponte para o máximo do baixo.')
         print('Depois, aperte o botão')
         self.espera_botao()
         self.pot_min = self.le_pot_motor()
