@@ -1,7 +1,7 @@
 import serial
 import time
 import serial
-from math import sin, cos, radians, pi
+from math import sin, cos, radians, pi, sqrt
 
 class Carrinho:
     def __init__(self, modo='azimute'):
@@ -13,6 +13,10 @@ class Carrinho:
         self.raio = 800  # precisa calibrar!!!
         self.azim = -90
         self.modo = modo
+
+    def r(self, azim):
+        # referencial do experimento para radianos usuais
+        return -(azim - 90) * pi / 180
 
     def __enter__(self):
         if self.modo == 'eleva':
@@ -85,14 +89,22 @@ class Carrinho:
     def anda_eleva_mirado(self, azim):
         return self.anda_azim_mirado(azim) 
 
+    def anda_diagonal(self, dist):
+
+        theta = self.r(self.azim)
+        dgrande = dist * cos(theta)
+        dpeq = dist * sin(theta)
+        self.anda_xy_mm(dpeq, dgrande)
+
+        self.raio += dist/abs(dist) * sqrt(dpeq**2 + dgrande**2)
+
+        return dpeq*self.passos_mm, dgrande*self.passos_mm
+
     def anda_azim(self, azim):
 
-        def r(azim):
-            # referencial do experimento para radianos usuais
-            return -(azim - 90) * pi / 180
 
-        th0 = r(self.azim)
-        th1 = r(azim)
+        th0 = self.r(self.azim)
+        th1 = self.r(azim)
 
         dgrande = self.raio * (cos(th1) - cos(th0))
         dpeq = self.raio * (sin(th1) - sin(th0))
@@ -123,10 +135,12 @@ class Carrinho:
         dir = self.direcao('z', passos)
 
         print(f'vou andar {passos} para mirar a caixa')
-        self.habilita_motores()
+        if self.modo == 'azimute':
+            self.habilita_motores()
         self._cmd(f'pz{dir}{abs(passos)}')
         time.sleep(0.5) 
-        self.desabilita_motores()
+        if self.modo == 'azimute':
+            self.desabilita_motores()
         return self.anda_azim(azim) 
         
 
