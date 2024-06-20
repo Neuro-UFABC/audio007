@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None):
+def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
     if lado == 'ambos':
         lmap = [1,2]
     elif lado == 'esq':
@@ -41,7 +41,7 @@ def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None):
         dados = np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
                       convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
 
-    sd.play(dados, mapping = lmap, blocking=True, samplerate=taxa)
+    sd.play(ganho*dados, mapping = lmap, blocking=True, samplerate=taxa)
 
 
 def toca_grava(estimulo, saida):
