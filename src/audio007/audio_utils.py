@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
+def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
     if lado == 'ambos':
         lmap = [1,2]
     elif lado == 'esq':
@@ -17,7 +17,11 @@ def toca_audio(arquivo_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
         raise ValueError('O argumento `lado` deve ser: "esq", "dir" ou "ambos"(padrão)')
 
     # TODO: melhor fazer isso só uma vez, arquivos podem ser longos
-    taxa_wav, dados = read(arquivo_wav)
+    if isinstance(dados_wav, str): # le do arquivo
+        taxa_wav, dados = read(dados_wav)
+    else:
+        taxa_wav = taxa #se for um array, tem que passar a taxa
+        dados = dados_wav
 
     # TODO: isso fazia sentido para grilos, mas destrói a psicofísica!
     #if len(dados.shape) > 1:
@@ -57,8 +61,7 @@ def toca_grava(estimulo, saida):
     print(f'Gravação concluída. Salvo arquivo {saida}.')
 
 
-def grava_binaural(segundos, fname):
-    fs = 44100  # Sample rate
+def grava_binaural(segundos, fname, fs = 44100): 
 
     if fname is None:
         timestr = time.strftime("%Y%m%d-%H%M%S")

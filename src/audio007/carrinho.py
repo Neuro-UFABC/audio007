@@ -13,6 +13,13 @@ class Carrinho:
         self.raio = 800  # precisa calibrar!!!
         self.azim = -90
         self.modo = modo
+        try:
+            assert modo in ['azimute','eleva']
+        except AssertionError:
+            print('Erro! `modo` deve ser "azimute" ou "eleva". Você falou', modo)
+            import sys
+            sys.exit(1)
+
 
     def r(self, azim):
         # referencial do experimento para radianos usuais

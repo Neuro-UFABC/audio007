@@ -36,6 +36,10 @@ class Apontador:
         ret = self._cmd('l')
         val = int(ret)
         return val
+
+    def anda(self, passos):
+        dir = '' if passos > 0 else '-'
+        self._cmd(f'p{dir}{abs(passos)}')
     
     def sobe(self, passos):
         self._cmd(f'p{passos}')
@@ -104,6 +108,12 @@ class Apontador:
         self.pot_min = self.le_pot_motor()
 
         return self.pot_min, self.pot_max
+
+    def habilita_motor(self):
+        self._cmd('h')
+
+    def desabilita_motor(self):
+        self._cmd('d')
 
     def _cmd(self, arg):
         scmd = str(arg) + '\n'
