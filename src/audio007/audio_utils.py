@@ -6,7 +6,7 @@ import numpy as np
 
 
 
-def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
+def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1], tipo='int16'):
     if lado == 'ambos':
         lmap = [1,2]
     elif lado == 'esq':
@@ -33,6 +33,16 @@ def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
     else:
         taxa = 44100
    
+
+    ## ATENÇÃO: CONVERSÃO PARA FLOAT HARDCODED
+    if tipo == 'int16':
+        dados = dados / 2**15  
+    elif tipo == 'int32':
+        dados = dados / 2**31  
+    else:
+        print('Tipo desconhecido!! Abortando...')
+        return 1
+
     if filtro is not None:
         #filtro_e, filtro_d = filtro.T/32768
         #dados_e, dados_d = dados.T/32768
@@ -40,16 +50,17 @@ def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=1):
         #dados_e = convolve(dados_e, filtro_e, mode='full', method='auto')  
         #dados_d = convolve(dados_d, filtro_d, mode='full', method='auto')  
         #dados = np.c_[dados_e, dados_d]
-        dados = dados / 32768  # TODO: conversão de int16 pra float hardcoded!
+
+        #dados = dados / 32768  # TODO: conversão de int16 pra float hardcoded!
         filtro = filtro / 32768  # TODO: conversão de int16 pra float hardcoded!
         dados = np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
                       convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
-
     sd.play(ganho*dados, mapping = lmap, blocking=True, samplerate=taxa)
 
 
-def toca_grava(estimulo, saida):
+def toca_grava(estimulo, saida, ganho=[1,1]):
     taxa_wav, est_array = read(estimulo)
+    est_array *= ganho
     duracao = len(est_array)
     print(f'Começando a tocar {estimulo}. Duração:{duracao}s')
     print(f'Começando gravação')
