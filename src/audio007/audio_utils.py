@@ -45,18 +45,10 @@ def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1], tip
         return 1
 
     if filtro is not None:
-        #filtro_e, filtro_d = filtro.T/32768
-        #dados_e, dados_d = dados.T/32768
+        dados = filtra(dados, filtro)
 
-        #dados_e = convolve(dados_e, filtro_e, mode='full', method='auto')  
-        #dados_d = convolve(dados_d, filtro_d, mode='full', method='auto')  
-        #dados = np.c_[dados_e, dados_d]
-
-        #dados = dados / 32768  # TODO: conversão de int16 pra float hardcoded!
-        #filtro = filtro / 32768  # TODO: conversão de int16 pra float hardcoded!
-        dados = np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
-                      convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
     sd.play(ganho*dados, mapping = lmap, blocking=True, samplerate=taxa)
+
 
 
 def toca_grava(estimulo, saida, ganho=[1,1]):
@@ -83,6 +75,61 @@ def grava_binaural(segundos, fname, fs = 44100):
     sd.wait()  # Wait until recording is finished
     write(fname, fs, rec)
     print(f'Gravação concluída. Salvo arquivo {fname}.')
+
+##############################
+# Refatorando
+
+def wavfile_pra_array(filename):
+    taxa, dados = read(filename)
+
+    if np.issubdtype(dados.dtype, np.integer):
+        print(f'Convertendo wav de {dados.dtype} para float!')
+        dmax = np.iinfo(dados.dtype).max
+        dados = dados.astype(np.float32) / dmax
+
+    return taxa, dados
+
+def centra_normaliza(dados):
+    print('Centralizando cada canal (não muda ILD!)')
+    dados = dados - np.mean(dados, axis=0, keepdims=True)
+
+    dado_max = np.abs(dados).max() 
+    if dado_max > 1:
+        print(f'Normalizando dados, máximo absoluto {dado_max : .3f} > 1!')
+        dados /= dado_max 
+
+    return dados
+
+def filtra(dados, filtro):
+    return np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
+                      convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
+
+def _tocagrava(entrada, saida, filtro=None, ganho=[1,1]):
+    taxa_entrada, est_array = wavfile_pra_array(entrada)
+
+    if filtro:
+        taxa_filtro, filtro_array = wavfile_pra_array(filtro)
+        if taxa_filtro != taxa_entrada:
+            print('Taxa de amostragem da entrada diferente da do filtro! Desisto!!')
+            return 1
+        print(filtro_array)
+        est_array = filtra(est_array, filtro_array)
+
+    est_array *= ganho
+    est_array = centra_normaliza(est_array) 
+
+    duracao = len(est_array)
+    print(f'Começando a tocar {entrada}. Duração:{duracao/taxa_entrada : .3f}s')
+    print(f'Começando gravação')
+
+    gravacao = sd.playrec(est_array, taxa_entrada, channels=2, blocking=True, dtype='float32')
+    sd.wait()
+    write(saida, taxa_entrada, gravacao)
+
+
+
+
+
 
 if __name__ == '__main__':
     print('gravando 5s em lixo.wav')
