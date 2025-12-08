@@ -4,6 +4,7 @@ from scipy.io.wavfile import write, read
 from scipy.signal import convolve
 import numpy as np
 
+sd.default.latency = [0.1, 0.1]
 
 
 def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1], tipo='int16'):
@@ -52,7 +53,7 @@ def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1], tip
         #dados = np.c_[dados_e, dados_d]
 
         #dados = dados / 32768  # TODO: conversão de int16 pra float hardcoded!
-        filtro = filtro / 32768  # TODO: conversão de int16 pra float hardcoded!
+        #filtro = filtro / 32768  # TODO: conversão de int16 pra float hardcoded!
         dados = np.c_[convolve(dados[:,0], filtro[:,0], mode='full', method='auto'),
                       convolve(dados[:,1], filtro[:,1], mode='full', method='auto')]
     sd.play(ganho*dados, mapping = lmap, blocking=True, samplerate=taxa)
