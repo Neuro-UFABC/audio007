@@ -3,11 +3,17 @@ import time
 import serial
 from math import sin, cos, radians, pi, sqrt
 
+debug = False
+
+def mensagem(msg):
+    if debug:
+        print(msg)
+
 class Carrinho:
     def __init__(self, modo='azimute'):
         #self._ser = serial.Serial('/dev/ttyACM0') # TODO: pode ser outra
         self._ser = serial.Serial('/dev/ttyUSB0') # TODO: pode ser outra
-        print('Aberta serial', self._ser.name)
+        mensagem('Aberta serial' + self._ser.name)
         time.sleep(2) # espera arduino resetar
         self.passos_mm = 40  # precisa calibrar!!!
         self.raio = 800  # precisa calibrar!!!
@@ -36,11 +42,11 @@ class Carrinho:
         self._ser.close()
 
     def habilita_motores(self):
-        print("Habilitando motores")
+        mensagem("Habilitando motores")
         self._cmd('h')
         
     def desabilita_motores(self):
-        print("Desabilitanto motores")
+        mensagem("Desabilitanto motores")
         self._cmd('d')
 
     def anda_xy_mm(self, mm_x, mm_y):
@@ -54,7 +60,7 @@ class Carrinho:
         diry = self.direcao('y', mm_y) 
         passosy = int(abs(mm_y) * self.passos_mm)
 
-        print(f'Vou dar {diry}{passosy} passos no eixo '
+        mensagem(f'Vou dar {diry}{passosy} passos no eixo '
                 f'grande e {dirx}{passosx} no eixo pequeno')
 
         self._cmd(f'P{dirx}{passosx},{diry}{passosy}')
@@ -74,7 +80,7 @@ class Carrinho:
 
         dir = self.direcao(xy, mm)
         passos = int(abs(mm) * self.passos_mm)
-        print(f'Vou dar {dir}{passos} passos no eixo {eixo}')
+        mensagem(f'Vou dar {dir}{passos} passos no eixo {eixo}')
 
         self._cmd(f'p{xy}{dir}{passos}')
 
@@ -141,7 +147,7 @@ class Carrinho:
 
         dir = self.direcao('z', passos)
 
-        print(f'vou andar {passos} para mirar a caixa')
+        mensagem(f'vou andar {passos} para mirar a caixa')
         if self.modo == 'azimute':
             self.habilita_motores()
         self._cmd(f'pz{dir}{abs(passos)}')
@@ -153,16 +159,16 @@ class Carrinho:
 
     def sobe_mm(self, mm):
         passos = int(self.passos_mm * mm)
-        print(f'Vou dar {passos} passos')
+        mensagem(f'Vou dar {passos} passos')
         self.sobe(passos)
 
     def desce_mm(self, mm):
         passos = int(self.passos_mm * mm)
-        print(f'Vou dar {passos} passos')
+        mensagem(f'Vou dar {passos} passos')
         self.desce(passos)
 
     def delay(self, delay):
-        print(f'Ajustando delay para {delay} ms')
+        mensagem(f'Ajustando delay para {delay} ms')
         self._cmd(f'c{delay}')
 
     def sobe(self, passos):
