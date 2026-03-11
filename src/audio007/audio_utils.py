@@ -82,7 +82,7 @@ def grava_binaural(segundos, fname, fs = 44100):
 
 def nivel(som, taxa=None):
     if type(som) == str:
-        rate, data = read(som)
+        rate, data = wavfile_pra_array(som)
     else:
         data = som
         rate = taxa
@@ -150,8 +150,8 @@ def _grava_binaural(segundos, fname, fs = 44100):
     if fname is None:
         timestr = time.strftime("%Y%m%d-%H%M%S")
         fname = f'gravacao-{timestr}.wav'
-    print(f'Começando a tocar {entrada}. Duração:{segundos/fs: .3f}s')
-    rec = sd.rec(int(segundos * fs), samplerate=fs, channels=2, format='float32')
+    print(f'Gravando {fname} -- Taxa: {fs} -- Duração:{segundos: .3f}s')
+    rec = sd.rec(int(segundos * fs), samplerate=fs, channels=2, dtype='float32')
     sd.wait() 
     write(fname, fs, rec)
     print(f'Gravação concluída. Salvo arquivo {fname}.')
@@ -168,7 +168,7 @@ def _toca(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1]):
 
     # TODO: melhor fazer isso só uma vez, arquivos podem ser longos
     if isinstance(dados_wav, str): # le do arquivo
-        taxa_wav, est_array = read(dados_wav)
+        taxa_wav, est_array = wavfile_pra_array(dados_wav)
     else:
         taxa_wav = taxa #se for um array, tem que passar a taxa
         est_array = dados_wav
