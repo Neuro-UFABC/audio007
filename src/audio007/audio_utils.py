@@ -31,9 +31,9 @@ def toca_audio(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1], tip
     #    print('Áudio estéreo! Tomando média dos canais.')
 
     if taxa is None:
-        taxa = taxa_wav
+        taxa = 48000
     else:
-        taxa = 44100
+        taxa = taxa_wav
    
 
     ## ATENÇÃO: CONVERSÃO PARA FLOAT HARDCODED
@@ -179,9 +179,9 @@ def _toca(dados_wav, lado='ambos', taxa=None, filtro=None, ganho=[1,1]):
     #    print('Áudio estéreo! Tomando média dos canais.')
 
     if taxa is None:
-        taxa = taxa_wav
+        taxa = 48000
     else:
-        taxa = 44100
+        taxa = taxa_wav 
    
     if filtro:
         taxa_filtro, filtro_array = wavfile_pra_array(filtro)
