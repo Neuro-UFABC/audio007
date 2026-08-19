@@ -11,8 +11,8 @@ class Apontador:
         time.sleep(2) # espera arduino resetar
 
         print('Usando calibração tosca!! lembre-se de calibrar!!')
-        self.pot_min = 770
-        self.pot_max = 173
+        self.pot_min = 1023
+        self.pot_max = 327
 
 
         # TODO: isso precisa ser medido!
