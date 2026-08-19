@@ -19,6 +19,8 @@ class Carrinho:
         self.raio = 800  # precisa calibrar!!!
         self.azim = -90
         self.modo = modo
+
+        self.velocidade = 3200 if self.modo == 'azimute' else 2600
         try:
             assert modo in ['azimute','eleva']
         except AssertionError:
@@ -87,14 +89,17 @@ class Carrinho:
         if self.modo == 'azimute':
             self.desabilita_motores()
 
+        return passos
+
     def zera(self):
         self.desabilita_motores()
         input('Ponha manualmente na origem e aperte Enter...')
         self.azim = -90
         self.habilita_motores()
-        self.anda_mm('grande', +70)
+        passos = self.anda_mm('grande', +70)             
         if self.modo == 'azimute':
             self.desabilita_motores()
+        return passos 
         
     def anda_eleva(self, eleva):
         self.anda_azim(eleva) 
@@ -127,6 +132,16 @@ class Carrinho:
         self.azim = azim
 
         return dpeq*self.passos_mm, dgrande*self.passos_mm
+
+    def espera(self, passos_acao):
+        passos = passos_acao if isinstance(passos_acao, (list, tuple)) else [passos_acao]
+        maxpasso = max(map(abs, passos))
+
+        print('Esperando caixinha andar', int(maxpasso), 'passos')
+
+        vel = 1600 if self.modo == 'azimute' else 600 
+        time.sleep(maxpasso / self.velocidade + 0.5)
+
 
     def direcao(self, eixo, passos):
         '''
